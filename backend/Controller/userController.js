@@ -65,8 +65,8 @@ const authUser = asyncHandler(async (req, res) => {
 });
 
 // api/user?search= username || email
-// 
-const searchUsers = asyncHandler( verifyJWT , async (req, res) => {
+
+const searchUsers = asyncHandler(async (req, res) => {
     const keyword = req.query.search
         ? {
             $or: [
@@ -75,15 +75,13 @@ const searchUsers = asyncHandler( verifyJWT , async (req, res) => {
             ]
         }
         : {};
-
-    // Exclude current user from search results and select specific fields
+        
     const users = await User.find({
-        ...keyword
-     
-    })
-
+        ...keyword,
+        _id: { $ne: req.user._id }  // Exclude current user
+    }).select('-password');  // Exclude password field
+    
     res.json(users);
 });
-
 
 module.exports = { registerUser, authUser ,searchUsers};
