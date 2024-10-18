@@ -1,6 +1,7 @@
 const asyncHandler = require('express-async-handler');
 const User = require('../model/userModel');
 const GenerateToken = require('../config/Jwt');
+const { verifyJWT } = require('../middleware/authenticationMiddleware');
 
 
 const registerUser = asyncHandler(async (req, res) => {
@@ -63,4 +64,26 @@ const authUser = asyncHandler(async (req, res) => {
     }
 });
 
-module.exports = { registerUser, authUser };
+// api/user?search= username || email
+// 
+const searchUsers = asyncHandler( verifyJWT , async (req, res) => {
+    const keyword = req.query.search
+        ? {
+            $or: [
+                { name: { $regex: req.query.search, $options: 'i' } },
+                { email: { $regex: req.query.search, $options: 'i' } }
+            ]
+        }
+        : {};
+
+    // Exclude current user from search results and select specific fields
+    const users = await User.find({
+        ...keyword
+     
+    })
+
+    res.json(users);
+});
+
+
+module.exports = { registerUser, authUser ,searchUsers};
