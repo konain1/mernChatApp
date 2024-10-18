@@ -5,6 +5,7 @@ const chats =require('./data/chatData')
 const connectDB = require('./config/db')
 const app = express()
 const userRoute = require('./route/userRoute')
+const chatRoute = require('./route/chatRoute')
 
 
 
@@ -17,6 +18,7 @@ app.use(cors())
 app.use(express.json());
 
 app.use('/api/user',userRoute)
+app.use('/api/chat',chatRoute)
 
 
 

@@ -4,10 +4,10 @@ const asyncHandler = require('express-async-handler');
 
 const verifyJWT = asyncHandler(async (req, res, next) => {
     // Check if Authorization header exists and starts with 'Bearer'
-    // if (!req.headers.authorization?.startsWith('Bearer')) {
-    //     res.status(401);
-    //     throw new Error('No token provided');
-    // }
+    if (!req.headers.authorization?.startsWith('Bearer')) {
+        res.status(401);
+        throw new Error('No token provided');
+    }
 
     try {
         // Extract token from Authorization header
