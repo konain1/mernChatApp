@@ -1,10 +1,10 @@
 const express = require('express')
 const router = express.Router();
 const { verifyJWT} = require('../middleware/authenticationMiddleware')
-const {accessChat} =require('../Controller/chatController')
+const {accessChat,fetchChats} =require('../Controller/chatController')
 const route = express.Router();
 
-// route.get('/',verifyJWT,fetchChats)
+route.get('/',verifyJWT,fetchChats)
 route.post('/',verifyJWT,accessChat)
 // route.post('/group',verifyJWT,CreateGroupChat)
 // route.put('/rename',verifyJWT,renameGroup)
