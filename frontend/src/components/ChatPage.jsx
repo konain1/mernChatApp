@@ -1,31 +1,36 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
+import { useDispatch } from 'react-redux'
+import { updateUser } from '../redux/userSlice';
 
 function ChatPage () {
-    const [data,setData]=useState([])
 
-   async function fetchChats(){
-    try {
-        let chats =  await axios.get('http://localhost:5001/api/chats')
-        console.log(chats.data)
-        setData(chats.data)
-
-    } catch (error) {
-        console.log(error)
-    }
-      
-    }
-
+const dispatch = useDispatch()
+const [loginUser,setLoginUser]=useState()
+   
     useEffect(()=>{
-        fetchChats()
-    },[])
+      let localUser = JSON.parse(localStorage.getItem('userInfo'))
+      console.log('localuser ' ,localUser)
+
+      if(localUser){
+        dispatch(updateUser(localUser))
+        setLoginUser(localUser)
+        console.log('done')
+      }
+    },[dispatch])
 
   return (
-    <>
-      <h1>ChatPage</h1>
-      {data?.map((chat,index)=>(<div key={index}>{chat.chatName}</div>))}
 
-    </>
+    <>
+    <h1>ChatPage</h1>
+    {loginUser && (
+      <>
+        <h1>{loginUser.name}</h1>
+        <p>{loginUser.email}</p>
+      </>
+    )}
+  </>
+   
   )
 }
 

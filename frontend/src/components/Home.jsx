@@ -1,12 +1,18 @@
-import React from 'react'
+import React, { useEffect,useState } from 'react'
 import { Button } from '@chakra-ui/react'
 import { Container,Box ,Text} from '@chakra-ui/react'
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react'
 import Loign from './Authentication/Loign'
 import Signup from './Authentication/Signup'
+
+// import {userUpdate} from '../redux/userSlice'
   
 
 function Home() {
+  // const dispatch = useDispatch()
+  // const [user,setUser]=useState()
+
+
   return (
     <>
   <Container maxW='xl' centerContent>
