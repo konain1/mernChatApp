@@ -1,9 +1,10 @@
 import { configureStore } from '@reduxjs/toolkit';
 import userReducer from './userSlice';
-
+import OneOneChatReducer from './OneOneChatSlice'
 const store = configureStore({
   reducer: {
-    userUpdateStore: userReducer
+    userUpdateStore: userReducer,
+    addChatUser1on1Store:OneOneChatReducer
   }
 });
 

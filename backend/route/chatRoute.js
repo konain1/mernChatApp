@@ -13,7 +13,6 @@ route.put('/rename',verifyJWT,renameGroup)
 route.put('/groupremove',verifyJWT,removeFromGroup)
 route.put('/groupadd',verifyJWT,addToGroup)
 
-
 module.exports = route
 
 
