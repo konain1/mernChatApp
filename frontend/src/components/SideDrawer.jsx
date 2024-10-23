@@ -111,8 +111,8 @@ function SideDrawer () {
       }
   
       const {data} = await axios.post("http://localhost:5001/api/chat",{userId},config)
-      console.log('chat data ',data.users)
-      dispatch(addChatUserOneOnOne(data.users))
+      console.log('access data ',data.users)
+      dispatch(addChatUserOneOnOne([...users,data.users]))
       setLoading(false)
       onClose()
     } catch (error) {

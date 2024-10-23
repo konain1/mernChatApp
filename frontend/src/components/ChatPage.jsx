@@ -28,7 +28,8 @@ function ChatPage() {
 
     {loginUser && <SideDrawer></SideDrawer>}
     <Box display="flex" justifyContent="space-between" p="10px" w="100%" h="90vh" border="1px solid black">
-      {loginUser && <MyChatBox/>}
+    
+      {loginUser && <MyChatBox user={loginUser}/>}
       {loginUser && <ChatDashboard/>}
 
     </Box>

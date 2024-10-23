@@ -2,7 +2,7 @@ import React from 'react'
 
 function ChatDashboard() {
   return (
-    <div>ChatDashboard</div>
+    <div  style={{border:'1px solid black' , width:'60%'} }>ChatDashboard</div>
   )
 }
 
