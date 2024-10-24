@@ -159,9 +159,9 @@ function SideDrawer() {
         p="5px 10px"
         borderWidth="5px"
       >
-        <Tooltip label='Search users to chat' hasArrow placement='bottom-end'>
-          <Button variant="ghost" onClick={onOpen}>
-            <Text px={4}>Search User</Text>
+        <Tooltip  bg='#328C95' label='Search users to chat' hasArrow placement='bottom-end'>
+          <Button bg='#328C95' color='darkgrey' onClick={onOpen}>
+            <Text  px={4}>Search User</Text>
           </Button>
         </Tooltip>
 
