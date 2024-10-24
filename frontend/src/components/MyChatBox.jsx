@@ -1,8 +1,8 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import personalChatHook from '../customeHook/personalChatHook';
-import { useSelector } from 'react-redux';
-import { Box, Button, Text, Stack, Avatar, Input } from '@chakra-ui/react';
-import ChatLoading from './ChatLoading';
+import React, { useState, useMemo, useEffect } from 'react'
+import personalChatHook from '../customeHook/personalChatHook'
+import { useSelector } from 'react-redux'
+import { Box, Button, Text, Stack, Avatar, Input } from '@chakra-ui/react'
+import ChatLoading from './ChatLoading'
 import {
   Modal,
   ModalOverlay,
@@ -13,106 +13,117 @@ import {
   ModalCloseButton,
   useDisclosure
 } from '@chakra-ui/react'
-import getUserNameFn from './configChat/chatLogin';
+import getUserNameFn from './configChat/chatLogin'
+import GroupChatModel from './GroupChatModel'
 
+function MyChatBox ({ user }) {
+  const chats = personalChatHook(user.id)
+  const [selectedChat, setSelectedChat] = useState(null)
+  const getChats = useSelector(state => state.ChatUser1on1Store.chats)
+  const loggedUser = useSelector(state => state.userUpdateStore.users)
 
-function MyChatBox({ user }) {
-  const chats = personalChatHook(user.id);
-  const [selectedChat, setSelectedChat] = useState(null);
-  const getChats = useSelector(state => state.ChatUser1on1Store.chats);
-  const loggedUser = useSelector(state => state.userUpdateStore.users);
   const { isOpen, onOpen, onClose } = useDisclosure()
 
-
-
-
   // Memoize the getUserName function to prevent unnecessary recalculations
-  const getUserName = useMemo(() => (users) => {
-    if (!users) return "Chat";
-    const chatUser = users.find(user => user._id !== loggedUser.id);
-   
-    return chatUser ? chatUser.name : "Chat";
-  }, [loggedUser._id]);
+  const getUserName = useMemo(
+    () => users => {
+      if (!users) return 'Chat'
+      const chatUser = users.find(user => user._id !== loggedUser.id)
+
+      return chatUser ? chatUser.name : 'Chat'
+    },
+    [loggedUser._id]
+  )
 
   // Handle chat selection
-  const handleChatSelect = (chat) => {
-    const newuser = chat.users.find((user)=>user._id === loggedUser.id)
-    console.log('chat' , newuser)
-    setSelectedChat(chat);
-  };
+  const handleChatSelect = chat => {
+    const newuser = chat.users.find(user => user._id === loggedUser.id)
+    console.log('chat', newuser)
+    setSelectedChat(chat)
+  }
 
-
-  const hadleAddGroupChat = ()=>{
+  const hadleAddGroupChat = () => {
     onOpen()
   }
-  
 
   return (
     <div style={{ width: '40%' }}>
       <Box
         display={{ base: selectedChat ? 'none' : 'flex', md: 'flex' }}
-        flexDir="column"
-        alignItems="center"
+        flexDir='column'
+        alignItems='center'
         p={3}
-        bg="white"
-        w="100%"
-        borderRadius="lg"
-        borderWidth="2px"
+        bg='white'
+        w='100%'
+        borderRadius='lg'
+        borderWidth='2px'
       >
         {/* Chat Header */}
         <Box
-          display="flex"
-          alignItems="center"
+          display='flex'
+          alignItems='center'
           pb={3}
           px={3}
-          fontSize={{ base: '22px', md: '30px' }}
-          fontFamily="Work Sans"
-          w="100%"
-          justifyContent="space-between"
+          fontFamily='Work Sans'
+          w='100%'
+          justifyContent='space-between'
+          fontSize={{ base: '8px', md: '14px', lg: '17px' }}
+
+          
         >
           My Chats
-          <Button 
-            fontSize={{ base: '10px', md: '10px', lg: '17px' }} 
-            display="flex"
-            colorScheme="teal"
-            onClick={hadleAddGroupChat}
-          >
-            Add Group Chat
-          </Button>
+          <GroupChatModel>
+            <Button
+              fontSize={{ base: '12px', md: '14px', lg: '17px' }} // Adjust font size for different screens
+              px={{ base: '10px', md: '20px', lg: '30px' }} // Responsive horizontal padding
+              py={{ base: '8px', md: '10px', lg: '12px' }} // Responsive vertical padding
+              width={{ base: '80px', md: '150px', lg: '200px' }} // Responsive width
+              height={{ base: '35px', md: '45px', lg: '50px' }}
+              // fontSize={{ base: '10px', md: '10px', lg: '17px' }}
+              display='flex-wrap'
+              colorScheme='teal'
+              onClick={hadleAddGroupChat}
+            >
+              NewGroup
+            </Button>
+          </GroupChatModel>
         </Box>
 
         {/* Chat List */}
         {getChats ? (
-          <Stack 
-            overflowY="scroll" 
-            w="100%"
-            h="100%"
-            spacing={3}
-          >
-            {getChats.map((chat) => (
+          <Stack overflowY='scroll' w='100%' h='100%' spacing={3}>
+            {getChats.map(chat => (
               <Box
                 onClick={() => handleChatSelect(chat)}
-                cursor="pointer"
+                cursor='pointer'
                 bg={selectedChat?._id === chat._id ? '#38B2AC' : '#E8E8E8'}
                 px={3}
                 py={2}
-                borderRadius="lg"
+                borderRadius='lg'
                 key={chat._id}
                 color={selectedChat?._id === chat._id ? 'white' : 'black'}
                 _hover={{
                   background: '#38B2AC',
-                  color: 'white',
+                  color: 'white'
                 }}
-                transition="all 0.3s"
+                transition='all 0.3s'
               >
                 <Text>
                   {!chat.isGroupChat ? (
                     <>
                       {getUserNameFn(chat.users)}
                       {chat.latestMessage && (
-                        <Text fontSize="xs" color={selectedChat?._id === chat._id ? 'white' : 'gray.500'}>
+                        <Text
+                          fontSize='xs'
+                          color={
+                            selectedChat?._id === chat._id
+                              ? 'white'
+                              : 'gray.500'
+                          }
+                        >
                           {chat.latestMessage.content.length > 50
-                            ? chat.latestMessage.content.substring(0, 51) + "..."
+                            ? chat.latestMessage.content.substring(0, 51) +
+                              '...'
                             : chat.latestMessage.content}
                         </Text>
                       )}
@@ -121,15 +132,22 @@ function MyChatBox({ user }) {
                     <>
                       {chat.chatName}
                       {chat.latestMessage && (
-                        <Text fontSize="xs" color={selectedChat?._id === chat._id ? 'white' : 'gray.500'}>
+                        <Text
+                          fontSize='xs'
+                          color={
+                            selectedChat?._id === chat._id
+                              ? 'white'
+                              : 'gray.500'
+                          }
+                        >
                           {`${chat.latestMessage.sender.name}: ${
                             chat.latestMessage.content.length > 50
-                              ? chat.latestMessage.content.substring(0, 51) + "..."
+                              ? chat.latestMessage.content.substring(0, 51) +
+                                '...'
                               : chat.latestMessage.content
                           }`}
                         </Text>
                       )}
-
                     </>
                   )}
                 </Text>
@@ -140,32 +158,8 @@ function MyChatBox({ user }) {
           <ChatLoading />
         )}
       </Box>
-
-    
-        <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Group_Name</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-          </ModalBody>
-          <Box display='flex' flexDir='column' justifyContent='center' alignItems='center'>
-
-          <Input  w='70%' placeholder='Enter Group Name' />
-          <Input  w='70%' placeholder='Add users' />
-
-          </Box>
-          <ModalFooter>
-            <Button colorScheme='red' mr={3} onClick={onClose}>
-              Close
-            </Button>
-            <Button colorScheme='blue'>Create</Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-      
     </div>
-  );
+  )
 }
 
-export default MyChatBox;
+export default MyChatBox

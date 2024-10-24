@@ -1,37 +1,42 @@
-import axios from "axios"
-import { useState ,useEffect} from "react"
-import { useSelector,useDispatch } from "react-redux"
-import { addPersonalChats } from "../redux/RecievePersonalChat"
+import axios from "axios";
+import { useState, useEffect, useCallback } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { addPersonalChats } from "../redux/RecievePersonalChat";
 
-const personalChatHook = (userId)=>{
+const personalChatHook = (userId) => {
+  const user = useSelector((state) => state.userUpdateStore.users);
+  const [pChat, setPchat] = useState();
+  const dispatch = useDispatch();
 
-  
-    const user = useSelector(state => state.userUpdateStore.users)
-    const [pChat,setPchat]=useState()
-    const dispatch = useDispatch();
+  // Memoize fetchPersonalChats to prevent it from being recreated on every render
+  const fetchPersonalChats = useCallback(async () => {
+    if (!user || !user.token) return;
 
-    useEffect(() => {
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${user.token}`,
+      },
+    };
 
-        fetchPersonalChats();
-
-    }, [userId]);
-  async function fetchPersonalChats (){
-
-    const config={
-        headers:{
-           'Content-Type': 'application/json',
-          Authorization: `Bearer ${user.token}`
-        }
-      }
-  
+    try {
       const { data } = await axios.get("http://localhost:5001/api/chat", config);
-      
-      setPchat(data)
-      dispatch(addPersonalChats(data))
-  }
+      setPchat(data);
+      dispatch(addPersonalChats(data));
+    } catch (error) {
+      console.error("Failed to fetch personal chats", error);
+    }
+  }, [user, dispatch]);
 
-  console.log(pChat)
-  return pChat
-}
+  // Trigger fetch when userId or user.token changes
+  useEffect(() => {
+    if (userId && user.token) {
+      fetchPersonalChats();
+    }
+  }, [userId, user.token, fetchPersonalChats]);
 
-export default personalChatHook
+  console.log(pChat);
+  return pChat;
+};
+
+export default personalChatHook;
