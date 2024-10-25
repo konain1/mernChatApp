@@ -9,12 +9,15 @@ import {
     ModalCloseButton,
     useDisclosure,Box,Input,Button,
     useToast,
-    FormControl
+    FormControl,
+    Stack
   } from '@chakra-ui/react'
 
   import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {addChatUserOneOnOne} from '../redux/OneOneChatSlice'
+import useSearchUser from '../customeHook/useSearchUser'
+import UserListItems from './UserListItems'
 
 
 
@@ -23,11 +26,13 @@ import {addChatUserOneOnOne} from '../redux/OneOneChatSlice'
 function GroupChatModel({children}) {
     const { isOpen, onOpen, onClose } = useDisclosure()
     const [ search,setSearch] = useState()
-    const [searchResult,setSearchResult] = useState([]);
+    // const [searchResult,setSearchResult] = useState([]);
     const [selectedUsers,setSelectedUsers]=useState([])
     const [groupName,setGroupName]=useState()
     const [loading,setLoading]=useState(false)
     const toast = useToast()
+    const [searchResult, searchUsers] = useSearchUser(setLoading) 
+
 
     
 
@@ -37,11 +42,16 @@ function GroupChatModel({children}) {
     const dispatch = useDispatch()
 
 
-    const handleSearchUsers = (searched)=>{
-
+    const handleSearchUsers = (query)=>{
+         searchUsers(query)
+         console.log(searchResult)
     }
     const handleSubmit = ()=>{
-        
+
+    }
+
+    const handleGroup = ()=>{
+        console.log('handleGroup')
     }
 
   return (
@@ -67,7 +77,12 @@ function GroupChatModel({children}) {
             <Input  w='70%' placeholder='Add users' onChange={(e)=>{handleSearchUsers(e.target.value)}} />
             </FormControl>
             {/* render search users here */}
+            
+            <Stack>
 
+            {loading?   <Box textAlign="center">Loading...</Box> : ( searchResult?.slice(0,4).map((user)=>(<UserListItems key={user.id} user={user} handleFunction={()=>{handleGroup}} />)))}
+
+            </Stack>
           </Box>
           <ModalFooter>
             <Button colorScheme='red' mr={3} onClick={onClose}>

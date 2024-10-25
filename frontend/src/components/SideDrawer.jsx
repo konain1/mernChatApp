@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react'
 import { Box, Tooltip, Button, Text, Avatar } from '@chakra-ui/react'
 import ProfileModal from './ProfileModal'
 import UserListItems from './UserListItems'
+import useSearchUser from '../customeHook/useSearchUser'
+
+
 import {
   Menu,
   MenuButton,
@@ -31,15 +34,16 @@ import { addChatUserOneOnOne } from '../redux/OneOneChatSlice'
 
 function SideDrawer () {
   const [search, setSearch] = useState('')
-  const [searchResult, setSearchResult] = useState([])
   const [loading, setLoading] = useState(false)
   const [loadingChat, setLoadingChat] = useState(false)
   const navigate = useNavigate()
 
+  const [searchResult, searchUsers] = useSearchUser(setLoading) 
+
   // Redux
   const dispatch = useDispatch()
   const user = useSelector(state => state.userUpdateStore.users)
-  const chats = useSelector(state => state.ChatUser1on1Store.chats) // Updated selector
+  const chats = useSelector(state => state.ChatUser1on1Store.chats) 
   const selectedChat = useSelector(
     state => state.ChatUser1on1Store.selectedChat
   )
@@ -76,47 +80,12 @@ function SideDrawer () {
 
   const logoutFunction = () => {
     localStorage.removeItem('userInfo')
-    dispatch(addChatUserOneOnOne([])) // Clear chats on logout
+    dispatch(addChatUserOneOnOne([])) 
     navigate('/')
   }
 
-  const handleSearch = async () => {
-    if (!search) {
-      toast({
-        title: 'Please enter something in search',
-        position: 'top-left',
-        status: 'warning',
-        duration: 2000,
-        isClosable: true
-      })
-      return
-    }
-
-    try {
-      setLoading(true)
-      const config = {
-        headers: {
-          Authorization: `Bearer ${user.token}`
-        }
-      }
-
-      const { data } = await axios.get(
-        `http://localhost:5001/api/user/search?search=${search}`,
-        config
-      )
-      setLoading(false)
-      setSearchResult(data)
-    } catch (error) {
-      toast({
-        title: 'Error occurred!',
-        description: 'Failed to load search results',
-        position: 'top-left',
-        status: 'error',
-        duration: 2000,
-        isClosable: true
-      })
-      setLoading(false)
-    }
+  const handleSearch = () => {
+    searchUsers(search) // Call searchUsers with the query
   }
 
   const accessChat = async userId => {
@@ -135,14 +104,12 @@ function SideDrawer () {
         config
       )
 
-      // Check if chat already exists, if not add it
       if (!chats.find(c => c._id === data._id)) {
         dispatch(addChatUserOneOnOne([...chats, data]))
       }
 
       setLoadingChat(false)
       onClose()
-      // Navigate to the chat or update UI as needed
     } catch (error) {
       toast({
         title: 'Failed to create chat',
@@ -158,36 +125,17 @@ function SideDrawer () {
 
   return (
     <>
-      <Box
-        display='flex'
-        justifyContent='space-between'
-        alignItems='center'
-        bg='white'
-        w='100%'
-        p='5px 10px'
-        borderWidth='5px'
-      >
-        <Tooltip
-          bg='#328C95'
-          label='Search users to chat'
-          hasArrow
-          placement='bottom-end'
-        >
+      <Box display='flex' justifyContent='space-between' alignItems='center' bg='white' w='100%' p='5px 10px' borderWidth='5px'>
+        <Tooltip bg='#328C95' label='Search users to chat' hasArrow placement='bottom-end'>
           <Button bg='#328C95' color='darkgrey' onClick={onOpen}>
             <Text px={4}>Search User</Text>
-           
           </Button>
         </Tooltip>
 
         <div style={{ display: 'flex', marginRight: '10px' }}>
           <Menu>
             <MenuButton as={Button}>
-              <Avatar
-                size='sm'
-                cursor='pointer'
-                name={user.name}
-                src={user.pic}
-              />
+              <Avatar size='sm' cursor='pointer' name={user.name} src={user.pic} />
             </MenuButton>
             <MenuList>
               <ProfileModal user={user}>
@@ -199,12 +147,7 @@ function SideDrawer () {
         </div>
       </Box>
 
-      <Drawer
-        isOpen={isOpen}
-        placement='left'
-        onClose={onClose}
-        finalFocusRef={btnRef}
-      >
+      <Drawer isOpen={isOpen} placement='left' onClose={onClose} finalFocusRef={btnRef}>
         <DrawerOverlay />
         <DrawerContent>
           <DrawerCloseButton />
@@ -218,20 +161,14 @@ function SideDrawer () {
                 value={search}
                 onChange={e => setSearch(e.target.value)}
               />
-              <Button onClick={handleSearch} isLoading={loading}>
-                Go
-              </Button>
+              <Button onClick={handleSearch} isLoading={loading}>Go</Button>
             </Box>
 
             {loading ? (
               <ChatLoading />
             ) : (
               searchResult?.map(user => (
-                <UserListItems
-                  key={user._id}
-                  user={user}
-                  handleFunction={() => accessChat(user._id)}
-                />
+                <UserListItems key={user._id} user={user} handleFunction={() => accessChat(user._id)} />
               ))
             )}
             {loadingChat && <ChatLoading />}
