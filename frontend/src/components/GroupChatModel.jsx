@@ -49,9 +49,21 @@ function GroupChatModel({children}) {
     const handleSubmit = ()=>{
 
     }
+    
 
-    const handleGroup = ()=>{
-        console.log('handleGroup')
+    const handleGroup = (userToAdd)=>{
+        if(selectedUsers.includes(userToAdd)){
+            toast({
+                title: 'User Allready Added',
+                // description: error.response?.data?.message || 'Something went wrong',
+                position: 'top-left',
+                status: 'warning',
+                duration: 2000,
+                isClosable: true
+              })
+        }
+
+        setSelectedUsers([...selectedUsers,userToAdd])
     }
 
   return (
@@ -61,7 +73,7 @@ function GroupChatModel({children}) {
     <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Group_Name</ModalHeader>
+          <ModalHeader>Create Group</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
           </ModalBody>
@@ -85,7 +97,7 @@ function GroupChatModel({children}) {
             </Stack>
           </Box>
           <ModalFooter>
-            <Button colorScheme='red' mr={3} onClick={onClose}>
+            <Button colorScheme='red' mr={3}   onClick={onClose}>
               Close
             </Button>
             <Button colorScheme='blue' onClick={handleSubmit}>Create</Button>
