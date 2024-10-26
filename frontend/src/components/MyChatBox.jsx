@@ -21,6 +21,7 @@ function MyChatBox ({ user }) {
   const [selectedChat, setSelectedChat] = useState(null)
   const getChats = useSelector(state => state.ChatUser1on1Store.chats)
   const loggedUser = useSelector(state => state.userUpdateStore.users)
+  const [isModelOPen,setIsModelOpen] = useState(false)
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 
@@ -68,11 +69,10 @@ function MyChatBox ({ user }) {
           w='100%'
           justifyContent='space-between'
           fontSize={{ base: '8px', md: '14px', lg: '17px' }}
-
-          
         >
           My Chats
-          <GroupChatModel>
+ 
+            <GroupChatModel >
             <Button
               fontSize={{ base: '12px', md: '14px', lg: '17px' }} // Adjust font size for different screens
               px={{ base: '10px', md: '20px', lg: '30px' }} // Responsive horizontal padding
@@ -82,11 +82,13 @@ function MyChatBox ({ user }) {
               // fontSize={{ base: '10px', md: '10px', lg: '17px' }}
               display='flex-wrap'
               colorScheme='teal'
-              onClick={hadleAddGroupChat}
+              onClick={ hadleAddGroupChat}
             >
               NewGroup
             </Button>
           </GroupChatModel>
+           
+         
         </Box>
 
         {/* Chat List */}
