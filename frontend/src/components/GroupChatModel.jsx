@@ -53,6 +53,7 @@ function GroupChatModel({ children }) {
   };
 
   const handleSubmit = async () => {
+    
     if (!selectedUsers.length || !groupName) {
       toast({
         title: 'Please fill all fields!',
@@ -89,6 +90,7 @@ function GroupChatModel({ children }) {
         { GroupName: groupName, users: JSON.stringify(selectedUsers.map((user) => user._id)) },
         config
       );
+      dispatch(addChatUserOneOnOne([...chat,data]))
       onClose();
       toast({
         title: 'Successfully created group!',
@@ -100,6 +102,7 @@ function GroupChatModel({ children }) {
   
     } catch (error) {
       console.error(error);
+
       toast({
         title: 'Cannot create group! Add more than 2 users',
         position: 'top',

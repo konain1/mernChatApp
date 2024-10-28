@@ -40,6 +40,10 @@ function SideDrawer () {
 
   const [searchResult, searchUsers] = useSearchUser(setLoading) 
 
+  // useEffect(()=>{
+
+  // },[searchResult])
+
   // Redux
   const dispatch = useDispatch()
   const user = useSelector(state => state.userUpdateStore.users)

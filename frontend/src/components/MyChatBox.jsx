@@ -15,6 +15,7 @@ import {
 } from '@chakra-ui/react'
 import getUserNameFn from './configChat/chatLogin'
 import GroupChatModel from './GroupChatModel'
+import { addChatUserOneOnOne } from '../redux/OneOneChatSlice'
 
 function MyChatBox ({ user }) {
   const chats = personalChatHook(user.id)
@@ -22,8 +23,9 @@ function MyChatBox ({ user }) {
   const getChats = useSelector(state => state.ChatUser1on1Store.chats)
   const loggedUser = useSelector(state => state.userUpdateStore.users)
   const [isModelOPen,setIsModelOpen] = useState(false)
-
+  const [loading,setLoading]=useState(true)
   const { isOpen, onOpen, onClose } = useDisclosure()
+  
 
   // Memoize the getUserName function to prevent unnecessary recalculations
   const getUserName = useMemo(
@@ -35,7 +37,7 @@ function MyChatBox ({ user }) {
     },
     [loggedUser._id]
   )
-
+  
   // Handle chat selection
   const handleChatSelect = chat => {
     const newuser = chat.users.find(user => user._id === loggedUser.id)
@@ -46,6 +48,7 @@ function MyChatBox ({ user }) {
   const hadleAddGroupChat = () => {
     onOpen()
   }
+  
 
   return (
     <div style={{ width: '40%' }}>
