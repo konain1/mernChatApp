@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Modal,
   ModalOverlay,
@@ -19,6 +19,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import useSearchUser from '../customeHook/useSearchUser';
 import UserListItems from './UserListItems';
 import UserGroupedMembers from './UserGroupedMembers';
+import axios from 'axios';
+import {addChatUserOneOnOne} from '../redux/OneOneChatSlice'
 
 function GroupChatModel({ children }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -30,9 +32,12 @@ function GroupChatModel({ children }) {
   const toast = useToast();
   const [searchResult, searchUsers] = useSearchUser(setLoading);
 
+
   const user = useSelector((state) => state.userUpdateStore.users);
   const chat = useSelector((state) => state.ChatUser1on1Store.chats);
   const dispatch = useDispatch();
+
+
 
   const handleSearchUsers = (query) => {
     if (query) {
@@ -47,9 +52,64 @@ function GroupChatModel({ children }) {
     setSelectedUsers(selectedUsers.filter((user) => user._id !== Deluser._id));
   };
 
-  const handleSubmit = () => {
-    // Group creation logic here
+  const handleSubmit = async () => {
+    if (!selectedUsers.length || !groupName) {
+      toast({
+        title: 'Please fill all fields!',
+        position: 'top',
+        status: 'warning',
+        duration: 2000,
+        isClosable: true,
+      });
+      return;
+    }
+  
+    try {
+      const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+      if (!userInfo) {
+        toast({
+          title: 'User not authenticated',
+          position: 'top',
+          status: 'error',
+          duration: 2000,
+          isClosable: true,
+        });
+        return;
+      }
+      
+      const token = userInfo.token;
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      };
+      
+      const { data } = await axios.post(
+        'http://localhost:5001/api/chat/group',
+        { GroupName: groupName, users: JSON.stringify(selectedUsers.map((user) => user._id)) },
+        config
+      );
+      onClose();
+      toast({
+        title: 'Successfully created group!',
+        position: 'top',
+        status: 'success',
+        duration: 2000,
+        isClosable: true,
+      });
+  
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: 'Cannot create group! Add more than 2 users',
+        position: 'top',
+        status: 'error',
+        duration: 2000,
+        isClosable: true,
+      });
+    }
   };
+  
 
   const handleGroup = (userToAdd) => {
     if (selectedUsers.some((user) => userToAdd._id === user._id)) {
