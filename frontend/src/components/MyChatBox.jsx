@@ -15,17 +15,19 @@ import {
 } from '@chakra-ui/react'
 import getUserNameFn from './configChat/chatLogin'
 import GroupChatModel from './GroupChatModel'
-import { addChatUserOneOnOne } from '../redux/OneOneChatSlice'
+import { addChatUserOneOnOne,setSelectedChat } from '../redux/OneOneChatSlice'
+import { useDispatch } from 'react-redux'
 
-function MyChatBox ({ user }) {
+function MyChatBox ({ user ,fetchAgain}) {
   const chats = personalChatHook(user.id)
-  const [selectedChat, setSelectedChat] = useState(null)
+  const [selectedChat, setChoosedChat] = useState(null)
   const getChats = useSelector(state => state.ChatUser1on1Store.chats)
   const loggedUser = useSelector(state => state.userUpdateStore.users)
   const [isModelOPen,setIsModelOpen] = useState(false)
   const [loading,setLoading]=useState(true)
   const { isOpen, onOpen, onClose } = useDisclosure()
   
+  const dispatch = useDispatch()
 
   // Memoize the getUserName function to prevent unnecessary recalculations
   const getUserName = useMemo(
@@ -42,7 +44,8 @@ function MyChatBox ({ user }) {
   const handleChatSelect = chat => {
     const newuser = chat.users.find(user => user._id === loggedUser.id)
     console.log('chat', newuser)
-    setSelectedChat(chat)
+    setChoosedChat(chat)
+    dispatch(setSelectedChat(chat))
   }
 
   const hadleAddGroupChat = () => {
@@ -51,7 +54,7 @@ function MyChatBox ({ user }) {
   
 
   return (
-    <div style={{ width: '40%' }}>
+
       <Box
         display={{ base: selectedChat ? 'none' : 'flex', md: 'flex' }}
         flexDir='column'
@@ -163,7 +166,7 @@ function MyChatBox ({ user }) {
           <ChatLoading />
         )}
       </Box>
-    </div>
+
   )
 }
 

@@ -16,7 +16,7 @@ const OneOneChatSlice = createSlice({
       state.selectedChat = action.payload
     },
     clearChats: (state) => {
-      state.chats = []
+      // state.chats = []
       state.selectedChat = null
     }
   }

@@ -10,6 +10,7 @@ import ChatDashboard from './ChatDashboard';
 function ChatPage() {
   const dispatch = useDispatch();
   const [loginUser, setLoginUser] = useState();
+  const [fetchAgain,setFetchAgain] = useState(false)
 
   useEffect(() => {
     const localUser = JSON.parse(localStorage.getItem('userInfo'));
@@ -29,8 +30,8 @@ function ChatPage() {
     {loginUser && <SideDrawer></SideDrawer>}
     <Box display="flex" justifyContent="space-between" p="10px" w="100%" h="90vh" border="1px solid black">
     
-      {loginUser && <MyChatBox user={loginUser}/>}
-      {loginUser && <ChatDashboard/>}
+      {loginUser && <MyChatBox user={loginUser} fetchAgain={fetchAgain}/>}
+      {loginUser && <ChatDashboard fetchAgain={fetchAgain} setFetchAgain={setFetchAgain} /> }
 
     </Box>
     </div>
