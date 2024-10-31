@@ -26,8 +26,18 @@ function MyChatBox ({ user ,fetchAgain}) {
   const [isModelOPen,setIsModelOpen] = useState(false)
   const [loading,setLoading]=useState(true)
   const { isOpen, onOpen, onClose } = useDisclosure()
+  const [rerender,setRerender]=useState(false)
+  const globalSelectedChat = useSelector(state=>state.ChatUser1on1Store.selectedChat)
+  console.log(globalSelectedChat)
   
   const dispatch = useDispatch()
+
+  if(globalSelectedChat != null){
+    console.log('useffff')
+
+
+  }
+ 
 
   // Memoize the getUserName function to prevent unnecessary recalculations
   const getUserName = useMemo(
@@ -56,7 +66,7 @@ function MyChatBox ({ user ,fetchAgain}) {
   return (
 
       <Box
-        display={{ base: selectedChat ? 'none' : 'flex', md: 'flex' }}
+        display={{ base: globalSelectedChat ? 'none' : 'flex', md: 'flex' }}
         flexDir='column'
         alignItems='center'
         p={3}
@@ -98,9 +108,9 @@ function MyChatBox ({ user ,fetchAgain}) {
         </Box>
 
         {/* Chat List */}
-        {getChats ? (
+        { getChats ? (
           <Stack overflowY='scroll' w='100%' h='100%' spacing={3}>
-            {getChats.map(chat => (
+            {getChats?.map(chat => (
               <Box
                 onClick={() => handleChatSelect(chat)}
                 cursor='pointer'

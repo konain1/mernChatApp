@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { updateUser } from '../redux/userSlice';
 import SideDrawer from './SideDrawer';
 import { Box } from '@chakra-ui/react';

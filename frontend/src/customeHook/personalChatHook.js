@@ -5,6 +5,7 @@ import { addPersonalChats } from "../redux/RecievePersonalChat";
 
 const personalChatHook = (userId) => {
   const user = useSelector((state) => state.userUpdateStore.users);
+  const clearChats = useSelector(state=>state.ChatUser1on1Store.selectedChat)
   const [pChat, setPchat] = useState();
   const dispatch = useDispatch();
 
@@ -35,7 +36,7 @@ const personalChatHook = (userId) => {
     }
   }, [userId, user.token, fetchPersonalChats]);
 
-  console.log(pChat);
+  console.log('pchart',pChat);
   return pChat;
 };
 

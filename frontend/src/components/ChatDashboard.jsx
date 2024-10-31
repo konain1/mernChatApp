@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { addChatUserOneOnOne } from '../redux/OneOneChatSlice'
 import { useSelector } from 'react-redux'
 import { Box, Center } from '@chakra-ui/react'
@@ -9,6 +9,9 @@ function ChatDashboard({fetchAgain,setFetchAgain}) {
   const selectedChat = useSelector(state=>state.ChatUser1on1Store.selectedChat)
   console.log(selectedChat)
 
+  useEffect(()=>{
+    console.log('rerender')
+  },[selectedChat])
   return (
     
       <Box display={{base:selectedChat ? 'flex' : 'none' , md:'flex'}} 

@@ -1,5 +1,5 @@
 import { Box,Button,Text } from '@chakra-ui/react'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { setSelectedChat,clearChats } from '../redux/OneOneChatSlice'
 
@@ -9,8 +9,10 @@ function SingleChat({fetchAgain,setFetchAgain}) {
     const dispatch = useDispatch()
 
     const handleBackButton = ()=>{
-        dispatch(clearChats(null))
+        dispatch(clearChats(" "))
+
     }
+ 
   return (
     <>
     {selectedChat ? (<>
@@ -24,15 +26,18 @@ function SingleChat({fetchAgain,setFetchAgain}) {
         alignItems='center'
         >
        <i class="fa-solid fa-arrow-left" onClick={handleBackButton}></i>
+       {!selectedChat.isGroupChat ? (<></>)
+        : (<>
+            {selectedChat.chatName.toUpperCase()}
+        </>)
+       }
         </Text>
+
     </>) :
     (<>
     <Box 
     display='flex'
-    justifyContent='center'
-
-     >
-
+    justifyContent='center' >
         <Text fontSize={{base:'25px'}}>Select the user to chat</Text>
     </Box>
     
