@@ -2,6 +2,9 @@ import { Box,Button,Text } from '@chakra-ui/react'
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { setSelectedChat,clearChats } from '../redux/OneOneChatSlice'
+import getUserNameFn, { getuserProfile } from './configChat/chatLogin'
+import ProfileModal from './ProfileModal'
+import UpdateGroupChatModel from './UpdateGroupChatModel'
 
 function SingleChat({fetchAgain,setFetchAgain}) {
 
@@ -26,18 +29,36 @@ function SingleChat({fetchAgain,setFetchAgain}) {
         alignItems='center'
         >
        <i class="fa-solid fa-arrow-left" onClick={handleBackButton}></i>
-       {!selectedChat.isGroupChat ? (<></>)
+       {!selectedChat.isGroupChat ? (<>
+        {getUserNameFn(selectedChat.users)}
+        <ProfileModal user={getuserProfile(selectedChat.users)} />
+       </>)
         : (<>
             {selectedChat.chatName.toUpperCase()}
+            {< UpdateGroupChatModel setFetchAgain={setFetchAgain} fetchAgain={fetchAgain} />} 
         </>)
        }
         </Text>
+        <Box
+        pb={3}
+        px={2}
+        w='100%'
+        h='100%'
+        display='flex'
+        justifyContent='flex-end'
+        bg="#E8E8E8"
+        borderRadius='lg'
+        overflowY='hidden'
+        >
+
+        </Box>
 
     </>) :
     (<>
     <Box 
     display='flex'
     justifyContent='center' >
+
         <Text fontSize={{base:'25px'}}>Select the user to chat</Text>
     </Box>
     

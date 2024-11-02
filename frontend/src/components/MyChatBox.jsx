@@ -27,16 +27,10 @@ function MyChatBox ({ user ,fetchAgain}) {
   const [loading,setLoading]=useState(true)
   const { isOpen, onOpen, onClose } = useDisclosure()
   const [rerender,setRerender]=useState(false)
+
   const globalSelectedChat = useSelector(state=>state.ChatUser1on1Store.selectedChat)
-  console.log(globalSelectedChat)
-  
   const dispatch = useDispatch()
 
-  if(globalSelectedChat != null){
-    console.log('useffff')
-
-
-  }
  
 
   // Memoize the getUserName function to prevent unnecessary recalculations
@@ -62,6 +56,9 @@ function MyChatBox ({ user ,fetchAgain}) {
     onOpen()
   }
   
+  useEffect(()=>{
+console.log('fetchAgain')
+  },[fetchAgain])
 
   return (
 

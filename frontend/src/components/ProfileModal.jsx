@@ -13,8 +13,8 @@ import {
 } from '@chakra-ui/react'
 import { useSelector } from 'react-redux'
 
-function ProfileModal () {
-  const user = useSelector(state => state.userUpdateStore.users)
+function ProfileModal ({user}) {
+  // const user = useSelector(state => state.userUpdateStore.users)
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 
