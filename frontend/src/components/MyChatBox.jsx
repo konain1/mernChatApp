@@ -31,9 +31,12 @@ function MyChatBox ({ user ,fetchAgain}) {
   const globalSelectedChat = useSelector(state=>state.ChatUser1on1Store.selectedChat)
   const dispatch = useDispatch()
 
+  console.log('after leaving ',getChats)
  
-
-  // Memoize the getUserName function to prevent unnecessary recalculations
+  // useEffect(()=>{
+  //   console.log('useEffect mybox')
+  //   } ,[getChats])
+    // Memoize the getUserName function to prevent unnecessary recalculations
   const getUserName = useMemo(
     () => users => {
       if (!users) return 'Chat'
@@ -57,8 +60,8 @@ function MyChatBox ({ user ,fetchAgain}) {
   }
   
   useEffect(()=>{
-console.log('fetchAgain')
-  },[fetchAgain])
+  console.log('fetchAgain')
+  },[])
 
   return (
 
@@ -146,6 +149,7 @@ console.log('fetchAgain')
                   ) : (
                     <>
                       {chat.chatName}
+                      {console.log('after leaving the group')}
                       {chat.latestMessage && (
                         <Text
                           fontSize='xs'

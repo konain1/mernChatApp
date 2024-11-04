@@ -44,6 +44,8 @@ function UpdateGroupChatModel ({fetAgain,setFetchAgain}) {
   const selectedChat = useSelector(
     state => state.ChatUser1on1Store.selectedChat
   )
+  const Chatdata = useSelector(state=>state.ChatUser1on1Store.chats);
+
   const user = useSelector(state=>state.userUpdateStore.users)
   const toast  = useToast()
   const dispatch = useDispatch()
@@ -53,9 +55,51 @@ function UpdateGroupChatModel ({fetAgain,setFetchAgain}) {
 
   useEffect(()=>{},[fetAgain])
 
-  const handleDeleteMember = user => {
-    console.log(user)
+  const handleDeleteMember = async userMember => {
+
+    setLoading(true)
+    if(selectedChat.groupAdmin._id !== user.id || userMember._id !== user.id){
+      toast({
+        title:'only admin can remove users',
+        status:'error',
+        duration:3000,
+        isClosable:true,
+        position:'bottom'
+    })
+    return
+    }
+
+
+    try {
+      const config ={
+      headers:{
+        Authorization: `Bearer ${user.token}`
+      }
+    }
+    const {data} = await axios.put('http://localhost:5001/api/chat/groupremove',
+      {
+        chatId:selectedChat._id,
+        userId:userMember._id
+      },config
+    )
+    dispatch(setSelectedChat(data))
+    setLoading(false)
+    } catch (error) {
+      toast({
+        title:'cant remove user',
+        status:'error',
+        duration:3000,
+        isClosable:true,
+        position:'bottom'
+    })
+    setLoading(false)
+    }
+
+    
+
   }
+
+
   const handleAddUser =async (thisUser)=>{
     if(selectedChat.users.some((u)=>u._id == thisUser._id)){
         toast({
@@ -107,6 +151,8 @@ function UpdateGroupChatModel ({fetAgain,setFetchAgain}) {
         })
     }
   }
+
+
   const handleRename = async() => {
     if(!groupChatName )return;
 
@@ -144,7 +190,52 @@ function UpdateGroupChatModel ({fetAgain,setFetchAgain}) {
     setShow(true)
     // Add search handling here
   }
-  const handleRemove = () => {}
+
+
+  const handleRemove = async () => {
+    if (!user || !selectedChat?._id) {
+      toast({
+        title: 'Need a valid user and chat selection to leave the group',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+        position: 'bottom'
+      });
+      return;
+    }
+  
+    try {
+      const config = {
+        headers: {
+          Authorization: `Bearer ${user.token}`
+        },
+        data: { chatId: selectedChat._id } // Pass `chatId` in `data` for DELETE
+      };
+  
+      // Make DELETE request with `chatId` in `data` and `config` for headers
+      const { data } = await axios.delete('http://localhost:5001/api/chat/groupleave', config);
+  
+      // If successful, reset the selected chat in
+      dispatch(addChatUserOneOnOne(Chatdata.filter((chatIId)=>chatIId._id != data.chat._id)))
+      dispatch(setSelectedChat(null));
+      setFetchAgain(!fetAgain)
+  
+      setLoading(false);
+    } catch (error) {
+      console.log('Error leaving group:', error);
+      toast({
+        title: 'Could not leave group',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+        position: 'bottom'
+      });
+      setLoading(false);
+    }
+
+
+  };
+
 
   return (
     <>
@@ -209,7 +300,7 @@ function UpdateGroupChatModel ({fetAgain,setFetchAgain}) {
                 onClick={handleRename}
                 flex="1"
               >
-                Update
+                rename
               </Button>
             </Box>
             </Box>

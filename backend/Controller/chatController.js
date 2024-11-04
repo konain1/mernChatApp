@@ -186,7 +186,7 @@ const removeFromGroup = asyncHandler(async (req, res) => {
     const chat = await Chat.findById(chatId);
     
     // Check if requester is admin
-    if (chat.groupAdmin.toString() !== req.user._id.toString()) {
+    if (chat.groupAdmin.toString() !== req.user._id.toString() ) {
         res.status(403);
         throw new Error("Only admin can remove members");
     }
@@ -207,4 +207,36 @@ const removeFromGroup = asyncHandler(async (req, res) => {
     res.json(updatedChat);
 });
 
-module.exports = {accessChat,fetchChats,CreateGroupChat,renameGroup,addToGroup,removeFromGroup}
+const leaveGroup = asyncHandler(async (req, res) => {
+    const { chatId } = req.body;
+    const userId = req.user?._id; // Check if req.user is populated
+
+    // Ensure chatId and userId are provided
+    if (!chatId || !userId) {
+        res.status(400);
+        throw new Error("Please provide chat ID and ensure you are authenticated");
+    }
+
+    // Find the chat and remove the user from the participants list
+    const updatedChat = await Chat.findByIdAndUpdate(
+        chatId,
+        { $pull: { users: userId } }, // Remove the user from the `users` array
+        { new: true } // Return the updated chat document
+    ).populate('users', '-password'); // Optional: populate user data excluding password
+
+    // If no chat is found, return an error
+    if (!updatedChat) {
+        res.status(404);
+        throw new Error("Chat not found or you are not a participant");
+    }
+
+    // Respond with the updated chat document
+    res.json({
+        success: true,
+        message: "Successfully left the group",
+        chat: updatedChat,
+    });
+});
+
+
+module.exports = {accessChat,leaveGroup,fetchChats,CreateGroupChat,renameGroup,addToGroup,removeFromGroup}
