@@ -54,29 +54,51 @@ const accessChat = asyncHandler(async (req,res)=>{
     }
 })
 
-const fetchChats = asyncHandler(async(req,res)=>{
+// const fetchChats = asyncHandler(async(req,res)=>{
 
-    try {
+//     try {
         
+//         const chats = await Chat.find({
+//             users:{$elemMatch:{ $eq:req.user._id } }
+//         }).populate('users','-password')
+//         .populate('groupAdmin','-password')
+//         .populate('latestMessage').sort({updateAt:-1})
+
+
+//         const populatedChats = await User.populate(chats,{
+//              path: 'latestMessage.sender',
+//             select: 'name email pic'
+//         })
+
+//         res.json(populatedChats);
+
+//     } catch (error) {
+//         console.error("Error fetching chats:", error); // Log the error for debugging
+//         res.status(400).json({ error: "Failed to fetch chats" });
+//     }
+// })
+const fetchChats = asyncHandler(async (req, res) => {
+    try {
         const chats = await Chat.find({
-            users:{$elemMatch:{ $eq:req.user._id } }
-        }).populate('users','-password')
-        .populate('groupAdmin','-password')
-        .populate('latestMessage').sort({updateAt:-1})
-
-
-        const populatedChats = await User.populate(chats,{
-             path: 'latestMessage.sender',
-            select: 'name email pic'
+            users: { $elemMatch: { $eq: req.user._id } }
         })
+        .populate('users', '-password')
+        .populate('groupAdmin', '-password')
+        .populate('latestMessage')
+        .sort({ updatedAt: -1 }); // this line additonally added without it will also work
 
-        res.json(populatedChats);
+        const populatedChats = await User.populate(chats, {
+            path: 'latestMessage.sender',
+            select: 'name email pic'
+        });
 
+        res.json(populatedChats); // Ensure a JSON response is always sent
     } catch (error) {
-        res.status(400);
-        throw new Error("Failed to fetch chats");
+        console.error("Error fetching chats:", error);
+        res.status(400).json({ error: "Failed to fetch chats" });
     }
-})
+});
+
 
 
 const CreateGroupChat = asyncHandler(async (req,res)=>{
