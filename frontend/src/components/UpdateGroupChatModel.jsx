@@ -23,7 +23,7 @@ import { setSelectedChat, addChatUserOneOnOne } from '../redux/OneOneChatSlice'
 import useSearchUser from '../customeHook/useSearchUser'
 import UserListItems from './UserListItems'
 
-function UpdateGroupChatModel ({fetAgain,setFetchAgain}) {
+function UpdateGroupChatModel ({fetAgain,setFetchAgain,fetchMessages}) {
 
     const [groupChatName, setGroupChatName] = useState("")
   const [search, setSearch] = useState("")
@@ -83,6 +83,7 @@ function UpdateGroupChatModel ({fetAgain,setFetchAgain}) {
       },config
     )
     dispatch(setSelectedChat(data))
+    fetchMessages()
     setLoading(false)
     } catch (error) {
       toast({
