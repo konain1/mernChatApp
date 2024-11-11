@@ -1,30 +1,50 @@
-const express = require('express')
-const dotenv = require('dotenv').config()
-const cors = require('cors')
-const chats =require('./data/chatData')
-const connectDB = require('./config/db')
-const app = express()
-const userRoute = require('./route/userRoute')
-const chatRoute = require('./route/chatRoute')
-const messageRoute = require('./route/messageRoute')
+const express = require('express');
+const dotenv = require('dotenv').config();
+const cors = require('cors');
+const chats = require('./data/chatData');
+const connectDB = require('./config/db');
+const app = express();
+const userRoute = require('./route/userRoute');
+const chatRoute = require('./route/chatRoute');
+const messageRoute = require('./route/messageRoute');
+const socketIo = require('socket.io');
 
-
-
+// Connect to the database
 connectDB();
 
-const port = process.env.PORT || 3000
+// Port setup
+const port = process.env.PORT || 5001;
 
-
-app.use(cors())
+app.use(cors());
 app.use(express.json());
 
-app.use('/api/user',userRoute)
-app.use('/api/chat',chatRoute)
-app.use('/api/message',messageRoute)
+// Routes
+app.use('/api/user', userRoute);
+app.use('/api/chat', chatRoute);
+app.use('/api/message', messageRoute);
 
+// Start server
+const server = app.listen(port, () => {
+  console.log(`Example app listening on port ${port}`);
+});
 
+// Socket.io setup
+const io = socketIo(server, {
+  pingTimeout: 60000,  
+  cors: { origin: `http://localhost:${port}` },
+});
 
+// Socket connection
+io.on("connection", (socket) => {
+  console.log('Connection socket established');
 
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
-})
+  socket.on('setup',(userData)=>{
+    console.log('Connection setup');
+    socket.join(userData._id)
+    socket.emit('connected')
+  })
+  socket.on('join room',(roomId)=>{
+    console.log('joined at ',roomId)
+    socket.join(roomId)
+  })
+});

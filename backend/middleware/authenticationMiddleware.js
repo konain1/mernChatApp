@@ -18,7 +18,6 @@ const verifyJWT = asyncHandler(async (req, res, next) => {
         
         // Find user and attach to request object (excluding password)
         req.user = await User.findById(decoded.id).select('-password')
-        console.log(req.user)
         
         if (!req.user) {
             res.status(401);

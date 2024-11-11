@@ -7,10 +7,8 @@ import SingleChat from './SingleChat'
 
 function ChatDashboard({fetchAgain,setFetchAgain}) {
   const selectedChat = useSelector(state=>state.ChatUser1on1Store.selectedChat)
-  console.log(selectedChat)
 
   useEffect(()=>{
-    console.log('rerender')
   },[selectedChat])
   return (
     

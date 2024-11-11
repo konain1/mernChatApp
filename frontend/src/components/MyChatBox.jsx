@@ -31,7 +31,6 @@ function MyChatBox ({ user ,fetchAgain}) {
   const globalSelectedChat = useSelector(state=>state.ChatUser1on1Store.selectedChat)
   const dispatch = useDispatch()
 
-  console.log('after leaving ',getChats)
  
   // useEffect(()=>{
   //   console.log('useEffect mybox')
@@ -50,7 +49,6 @@ function MyChatBox ({ user ,fetchAgain}) {
   // Handle chat selection
   const handleChatSelect = chat => {
     const newuser = chat.users.find(user => user._id === loggedUser.id)
-    console.log('chat', newuser)
     setChoosedChat(chat)
     dispatch(setSelectedChat(chat))
   }
@@ -149,7 +147,6 @@ function MyChatBox ({ user ,fetchAgain}) {
                   ) : (
                     <>
                       {chat.chatName}
-                      {console.log('after leaving the group')}
                       {chat.latestMessage && (
                         <Text
                           fontSize='xs'

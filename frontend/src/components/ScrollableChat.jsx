@@ -20,7 +20,7 @@ function ScrollableChat({message}) {
             <span style={{backgroundColor:`${m.sender._id !== user.id ? "#BEE3F8" : "#B9F5D0" }`, padding:'5px 15px' , borderRadius:'20px', 
       maxWidth:'75%',
       marginLeft:isSameSenderMargin(message,m,i,user.id),
-      marginTop:isSameUser(message,m,i) ? 3 :10
+
       }}>{m.content}</span>
         </div>
     ))}

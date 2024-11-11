@@ -1,44 +1,52 @@
-import { Box, Button, FormControl, Input, Spinner, Text } from '@chakra-ui/react'
-import React, { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { setSelectedChat, clearChats } from '../redux/OneOneChatSlice'
-import getUserNameFn, { getuserProfile } from './configChat/chatLogin'
-import ProfileModal from './ProfileModal'
-import UpdateGroupChatModel from './UpdateGroupChatModel'
-import axios from 'axios'
-import ScrollableChat from './ScrollableChat'
+import { Box, Button, FormControl, Input, Spinner, Text, useToast } from '@chakra-ui/react';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { setSelectedChat, clearChats } from '../redux/OneOneChatSlice';
+import getUserNameFn, { getuserProfile } from './configChat/chatLogin';
+import ProfileModal from './ProfileModal';
+import UpdateGroupChatModel from './UpdateGroupChatModel';
+import axios from 'axios';
+import ScrollableChat from './ScrollableChat';
+import io from 'socket.io-client';
+
+// Socket endpoint
+const Endpoint = 'http://localhost:5001';
+let socket,selectedChatCompare;
+
 function SingleChat({ fetchAgain, setFetchAgain }) {
     const [message, setMessage] = useState([]);
-    const [loading, setLoading] = useState(false)
-    const [newMessage, setNewMessage] = useState()
+    const [loading, setLoading] = useState(false);
+    const [newMessage, setNewMessage] = useState('');
+    const [socketConneted,setSocketConnected]=useState(false)
+    const toast = useToast();
 
-    const selectedChat = useSelector(state => state.ChatUser1on1Store.selectedChat)
-    const user = useSelector(state => state.userUpdateStore.users)
-    const dispatch = useDispatch()
+    const selectedChat = useSelector(state => state.ChatUser1on1Store.selectedChat);
+    const user = useSelector(state => state.userUpdateStore.users);
+    const dispatch = useDispatch();
 
     const handleBackButton = () => {
-        dispatch(clearChats(" "))
-    }
+        dispatch(clearChats(" "));
+    };
 
     const sendMessage = async (event) => {
         if (event.key === 'Enter' && newMessage) {
             try {
-                setLoading(true)
+                setLoading(true);
 
                 const config = {
                     headers: {
                         Authorization: `Bearer ${user.token}`,
                         "Content-Type": "application/json"
                     },
-                }
+                };
 
-                const { data } = await axios.post('http://localhost:5001/api/message', { content: newMessage, chatId: selectedChat._id }, config)
-                setLoading(false)
-                setNewMessage('')
-                setMessage([...message, data])
+                const { data } = await axios.post('http://localhost:5001/api/message', { content: newMessage, chatId: selectedChat._id }, config);
+                setLoading(false);
+                setNewMessage('');
+                setMessage([...message, data]);
 
             } catch (error) {
-                console.log('send message error ', error)
+                console.log('send message error', error);
                 toast({
                     title: 'Cannot send message',
                     status: 'error',
@@ -49,45 +57,56 @@ function SingleChat({ fetchAgain, setFetchAgain }) {
                 setLoading(false);
             }
         }
-    }
+    };
 
     const handleTyping = (e) => {
-        setNewMessage(e.target.value)
-    }
+        setNewMessage(e.target.value);
+    };
 
-    const fetchMessages = async()=>{
-        if(!selectedChat)return;
+    const fetchMessages = async () => {
+        if (!selectedChat) return;
 
         try {
             const config = {
                 headers: {
                     Authorization: `Bearer ${user.token}`
-                   
                 }
-            }
-            
+            };
+
             setLoading(true);
 
-            const {data} = await axios.get(`http://localhost:5001/api/message/${selectedChat._id}`,config)
+            const { data } = await axios.get(`http://localhost:5001/api/message/${selectedChat._id}`, config);
             setMessage(data);
-            setLoading(false)
+            setLoading(false);
+
+            // Join room after fetching messages
+            socket.emit('join room', selectedChat._id);
+            console.log(`Emitted join room event for room ID: ${selectedChat._id}`);
 
         } catch (error) {
-            console.log('fetch messages error ', error)
+            console.log('fetch messages error', error);
             toast({
-                title: 'Cannot send message',
+                title: 'Cannot fetch messages',
                 status: 'error',
                 duration: 3000,
                 isClosable: true,
                 position: 'bottom'
             });
-            
+            setLoading(false);
         }
-    }
+    };
 
-    useEffect(()=>{
-        fetchMessages()
-    },[selectedChat])
+    useEffect(() => {
+        fetchMessages();
+    }, [selectedChat]);
+
+    useEffect(() => {
+        socket = io(Endpoint);
+        socket.emit('setup',user)
+
+        socket.on('connection',()=>setSocketConnected(true))
+        // return () => socket.disconnect();  // Cleanup socket connection on component unmount
+    }, [user]);
 
     return (
         <>
@@ -127,7 +146,6 @@ function SingleChat({ fetchAgain, setFetchAgain }) {
                         p={3}
                     >
                         {/* Chat messages container */}
-                        
                         <Box
                             flex={1}
                             overflowY="auto"
@@ -138,16 +156,15 @@ function SingleChat({ fetchAgain, setFetchAgain }) {
                         >
                             {loading ? (
                                 <Spinner size='xl' h={20} w={20} alignSelf='center' margin='auto' />
-                            ) : <div style={{display:'flex' , flexDirection:'column' , overflowY:'scroll',scrollbarWidth:'none'}}>
-                            return <>
-                                <ScrollableChat message={message}></ScrollableChat>
-                            </>
-                        </div>
-                            }   
+                            ) : (
+                                <div style={{ display: 'flex', flexDirection: 'column', overflowY: 'scroll', scrollbarWidth: 'none' }}>
+                                    <ScrollableChat message={message} />
+                                </div>
+                            )}
                         </Box>
 
                         {/* Input field at the bottom */}
-                        <FormControl onKeyDown={sendMessage} isRequired>
+                        <FormControl onKeyDown={sendMessage} isRequired mt={3}>
                             <Input
                                 variant='filled'
                                 bg='#E0E0E0'
@@ -164,7 +181,7 @@ function SingleChat({ fetchAgain, setFetchAgain }) {
                 </Box>
             )}
         </>
-    )
+    );
 }
 
-export default SingleChat
+export default SingleChat;

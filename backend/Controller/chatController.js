@@ -110,7 +110,6 @@ const CreateGroupChat = asyncHandler(async (req,res)=>{
     }
 
     let userArray = typeof users === 'string' ? JSON.parse(users) : users;
-    console.log( "length ",userArray.length)
 
     if(userArray.length < 2){
         res.status(400);
