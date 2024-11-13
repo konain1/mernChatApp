@@ -24,6 +24,39 @@ function SingleChat({ fetchAgain, setFetchAgain }) {
     const user = useSelector(state => state.userUpdateStore.users);
     const dispatch = useDispatch();
 
+
+ useEffect(() => {
+    socket = io(Endpoint);
+    socket.emit('setup', user);
+    socket.on('connected', () => setSocketConnected(true));
+    
+    return () => {
+        if (socket) socket.disconnect();  // Cleanup socket connection
+    };
+}, [user]);
+
+useEffect(() => {
+    fetchMessages();
+    if(selectedChat){
+
+        selectedChatCompare = selectedChat
+    }
+}, [selectedChat]);
+
+useEffect(()=>{
+    socket.on("message recieved",(NewMessageRecieved)=>{
+        if(!selectedChatCompare || selectedChatCompare._id !== NewMessageRecieved.chat._id){
+            // notification logic
+        }else{
+            setMessage([...message,NewMessageRecieved])
+        }
+   
+    })
+    console.log('tiktok')
+})
+
+
+
     const handleBackButton = () => {
         dispatch(clearChats(" "));
     };
@@ -43,6 +76,7 @@ function SingleChat({ fetchAgain, setFetchAgain }) {
                 const { data } = await axios.post('http://localhost:5001/api/message', { content: newMessage, chatId: selectedChat._id }, config);
                 setLoading(false);
                 setNewMessage('');
+                socket.emit('new message',data)
                 setMessage([...message, data]);
 
             } catch (error) {
@@ -96,17 +130,7 @@ function SingleChat({ fetchAgain, setFetchAgain }) {
         }
     };
 
-    useEffect(() => {
-        fetchMessages();
-    }, [selectedChat]);
 
-    useEffect(() => {
-        socket = io(Endpoint);
-        socket.emit('setup',user)
-
-        socket.on('connection',()=>setSocketConnected(true))
-        // return () => socket.disconnect();  // Cleanup socket connection on component unmount
-    }, [user]);
 
     return (
         <>

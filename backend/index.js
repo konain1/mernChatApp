@@ -47,4 +47,17 @@ io.on("connection", (socket) => {
     console.log('joined at ',roomId)
     socket.join(roomId)
   })
+  socket.on('new message',(NewMessageRecieved)=>{
+    let chat = NewMessageRecieved.chat;
+
+    if(!chat.users) return console.log('users not available for chat')
+
+      chat.users.forEach(user => {
+        
+        if(user._id == NewMessageRecieved.sender._id) return
+
+        socket.in(user._id).emit('message recieved',NewMessageRecieved)
+      });
+  })
 });
+
