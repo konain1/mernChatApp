@@ -43,17 +43,19 @@ useEffect(() => {
     }
 }, [selectedChat]);
 
+
 useEffect(()=>{
+    
     socket.on("message recieved",(NewMessageRecieved)=>{
         if(!selectedChatCompare || selectedChatCompare._id !== NewMessageRecieved.chat._id){
             // notification logic
         }else{
-            setMessage([...message,NewMessageRecieved])
+            setMessage(prevMessages => [...prevMessages, NewMessageRecieved]);
         }
    
     })
     console.log('tiktok')
-})
+},[socket])
 
 
 
@@ -164,16 +166,16 @@ useEffect(()=>{
                         flexDirection="column"
                         justifyContent="space-between"
                         w="100%"
-                        h="100%"
+                        h="90%"
                         bg="#E8E8E8"
                         borderRadius="lg"
-                        p={3}
+                        p={2}
                     >
                         {/* Chat messages container */}
                         <Box
                             flex={1}
                             overflowY="auto"
-                            p={3}
+                            p={1}
                             mb={2} // Space above the input
                             borderRadius="lg"
                             bg="white"
